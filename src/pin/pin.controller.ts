@@ -9,7 +9,11 @@ export class PinController {
 
   @Post()
   async createPin(@Body() pinData: CreatePinDto) {
-    return this.pinService.createPin(pinData);
+    try {
+      return this.pinService.createPin(pinData);
+    } catch (err) {
+      console.error()
+    }
   }
 
   @Delete()

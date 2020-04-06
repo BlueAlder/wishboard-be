@@ -1,5 +1,5 @@
 export interface Pin {
-  id: string | number;
+  id: number;
   boardId: number;
   prodUrl: string;
   title: string;

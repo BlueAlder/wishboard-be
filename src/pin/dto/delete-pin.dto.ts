@@ -1,9 +1,11 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsInt, IsNotEmpty } from 'class-validator';
 
 export class DeletePinDto {
   @IsNotEmpty()
+  @IsInt()
   readonly id: number;
 
   @IsNotEmpty()
-  readonly boardId: string;
+  @IsInt()
+  readonly boardId: number;
 }

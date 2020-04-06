@@ -1,0 +1,5 @@
+runtime: nodejs12
+service: wishboard-backend
+
+env_variables:
+  SCRAPE_URL: https://us-central1-samcalamos-test.cloudfunctions.net/scrap-iconic

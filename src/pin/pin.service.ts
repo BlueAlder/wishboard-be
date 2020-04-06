@@ -15,7 +15,7 @@ export class PinService {
   datastore = new Datastore();
 
   // scrapeUrl = 'https://us-central1-samcalamos-test.cloudfunctions.net/scrap-iconic';
-  scrapeUrl = 'http://127.0.0.1:8080';
+  scrapeUrl = process.env.SCRAPE_URL;
 
   kind = 'pin';
 
@@ -25,12 +25,33 @@ export class PinService {
     const parsedUrl = url.parse(pinData.url);
     const hostName = parsedUrl.host;
 
+    // Verifying the board id Key
+    console.log(`Checking board id with id ${pinData.boardId}`);
+    const boardKey = this.datastore.key(["board", pinData.boardId]);
+    const [boardEntity] = await this.datastore.get(boardKey);
+
+    if (boardEntity === undefined) {
+      throw new HttpException({ 'message': `No board with id ${pinData.boardId} found` }, HttpStatus.BAD_REQUEST);
+    }
+
 
     console.log(`Calling cloud function with url ${pinData.url}`);
     console.log(`Cloud function url is ${this.scrapeUrl}`);
     const body = { url: pinData.url };
-    const response = await axios.post(this.scrapeUrl, body);
+
+
+    const response = await axios.post(this.scrapeUrl, body)
+      .catch(err => {
+        if (err.response.status === 400) {
+          throw new HttpException({ 'message': 'Unsupported Marketplace' }, HttpStatus.BAD_REQUEST);
+        } else {
+          throw new HttpException({ 'message': ['Unknown server error'] }, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+      });
+
     const pinDataScraped: Pin = response.data;
+
+
 
     const pinKey = this.datastore.key(['board', pinData.boardId, this.kind]);
     const createDate = Date.now();
@@ -48,12 +69,16 @@ export class PinService {
       },
     };
 
-    const entity = await this.datastore.save(pinDto);
+    const [entity] = await this.datastore.insert(pinDto);
+    console.log(entity);
     console.log(`Saved product with name ${pinDto.data.title}`);
+
+    console.log(pinKey.path);
 
     // Return value to user
     const pin: Pin = {
-      id: pinKey.path[0],
+      // @ts-ignore
+      id: parseInt(pinKey.path[1]),
       boardId: pinData.boardId,
       title: pinDataScraped.title,
       // eslint-disable-next-line @typescript-eslint/camelcase
@@ -76,7 +101,7 @@ export class PinService {
     console.log('hi');
     const [pinEntity] = await this.datastore.get(pinKey);
 
-    console.log(pinEntity);
+    // console.log(pinEntity);
     pinEntity.isDeleted = true;
 
     await this.datastore.update(pinEntity);

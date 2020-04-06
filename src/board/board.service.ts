@@ -17,12 +17,13 @@ export class BoardService {
     const boardKey = this.datastore.key([this.kind, boardId]);
     const [boardEntity] = await this.datastore.get(boardKey);
 
+
     // If board doesnt exist throw an error
     if (boardEntity === undefined) {
       throw new HttpException({message:`No board found with id ${boardId}`}, HttpStatus.BAD_REQUEST);
     }
 
-    console.log('Found board:');
+    console.log(`Found board: ${boardEntity.name}`);
     // console.log(boardEntity);
 
     // Build the board
@@ -40,7 +41,7 @@ export class BoardService {
     boardPins.forEach(pin => {
       // console.log(pin[this.datastore.KEY].id);
       const pinData : Pin = {
-        id: pin[this.datastore.KEY].id,
+        id: parseInt(pin[this.datastore.KEY].id),
         boardId: boardId,
         title: pin.title,
         img: pin.img,
@@ -48,7 +49,6 @@ export class BoardService {
         // eslint-disable-next-line @typescript-eslint/camelcase
         prodUrl: pin.prod_url,
       };
-      console.log(pinData)
       boardData.pins.push(pinData);
     });
 
@@ -59,6 +59,8 @@ export class BoardService {
 
   async createBoard(boardData: CreateBoardDto) {
     // Create the key with the kind
+    // boardData
+
     const boardKey = this.datastore.key(this.kind);
     const createDate = Date.now();
 
@@ -71,7 +73,9 @@ export class BoardService {
     };
     const [entity] = await this.datastore.save(board);
     // ['board', '12345678']
+    console.log(boardKey.path);
     const boardId = boardKey.path[1];
+
     console.log(`Saved board with ID ${boardId}`);
     const newBoard: Board = {
       id: boardId,
