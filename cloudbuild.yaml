@@ -1,0 +1,15 @@
+steps:
+
+  # Install required dependencies
+  - name: 'node:12.16.1'
+    entrypoint: 'npm'
+    args: ['install']
+
+  # Build production files
+  - name: 'node:12.16.1'
+    entrypoint: 'npm'
+    args: ['run', 'build']
+
+  # Deploy to GAE
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy', '--version=prod']

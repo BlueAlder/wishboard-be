@@ -5,6 +5,9 @@ export interface Pin {
   title: string;
   price: number;
   img: string;
+  marketplace: string;
+  tags: string[];
+  // createDate: string;
 }
 
 export interface PinEntity {
@@ -14,6 +17,8 @@ export interface PinEntity {
   price: number;
   prod_url: string;
   title: string;
+  marketplace: string;
+  tags: string[];
 }
 
 export interface PinRO {
