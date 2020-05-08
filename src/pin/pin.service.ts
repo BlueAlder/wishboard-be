@@ -37,9 +37,10 @@ export class PinService {
 
     const pinKey = this.datastore.key(['board', pinData.boardId, this.kind]);
 
-    const [pinEntity, newPinKey] = await this.savePinToDatastore(pinKey, pinDataScraped);
-    console.log(newPinKey.path);
+    const [pinDataSaved, newPinKey] = await this.savePinToDatastore(pinKey, pinDataScraped);
     // Return value to user
+    console.log(pinDataSaved)
+
     const pin: Pin = {
       // @ts-ignore
       id: parseInt(newPinKey.path[3]),
@@ -50,7 +51,7 @@ export class PinService {
       img: pinDataScraped.img,
       price: pinDataScraped.price,
       marketplace: pinDataScraped.marketplace,
-      tags: pinEntity.tags
+      tags: pinDataSaved.tags
     };
 
     return PinService.buildApiRo(pin, 'Successfully created pin');
@@ -123,11 +124,11 @@ export class PinService {
       },
     };
 
-    const [entity] = await this.datastore.upsert(pinDto);
+    await this.datastore.upsert(pinDto);
     console.log(`Saved product with name ${pinDto.data.title}`);
 
-    console.log(pinKey.path);
-    return [entity, pinKey];
+    // console.log(pinKey.path);
+    return [pinDto.data, pinKey];
   }
 
 }

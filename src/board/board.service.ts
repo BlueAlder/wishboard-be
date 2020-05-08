@@ -109,7 +109,7 @@ export class BoardService {
     const scrapePromises = boardPins.map((pin) => this.pinService.scrapeUrlData(pin.prod_url)
       .then((pinDataScraped) => {
           pinDataScraped.tags  = [...new Set([...pinDataScraped.tags, ...pin.tags])]
-          console.log(pinDataScraped.tags)
+          // console.log(pinDataScraped.tags)
           return this.pinService.savePinToDatastore(pin[this.datastore.KEY], pinDataScraped);
         }
       ));
